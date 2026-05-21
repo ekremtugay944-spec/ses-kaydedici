@@ -245,8 +245,20 @@ Verilen metinden ŞU ALANLARI çıkar (tarih çıkarma! O ayrı yapılacak):
   - "yarın", "Cuma", "ay sonu", "25 Mayıs" vb. varsa true
   - "tekrar arayacağız" tek başına ise false (eksik bilgi)
 - date_phrase: Metindeki tarihle ilgili olan kısmın tam kelimeleri (örn: "yarın", "Cuma sabahı", "25 Mayıs", "haftaya Salı", "ay sonu"). Yoksa null.
-- is_conversational: Kullanıcı hatırlatma/CRM taahhüdü kaydetmek veya düzenlemek yerine; selam veriyorsa, nasılsın diyorsa, botun ne işe yaradığını/nasıl kullanılacağını soruyorsa veya genel/günlük sohbet amaçlı konuşuyorsa true, yoksa false.
-- chat_response: Eğer is_conversational true ise, kullanıcıya günlük samimi ama son derece profesyonel, yardımsever ve "Gözde Plastik CRM Asistanı" kimliğiyle verilecek harika bir Türkçe cevap. is_conversational false ise null.
+- is_conversational: Kullanıcı hatırlatma/CRM taahhüdü kaydetmek veya düzenlemek yerine; selam veriyorsa, nasılsın diyorsa, botun ne işe yaradığını/nasıl kullanılacağını soruyorsa, genel/günlük sohbet amaçlı konuşuyorsa YA DA bizden bir rapor, liste, analiz, özet, risk durumu veya müşteri kartı istiyorsa (örn: bugün ne var, yarınki ödemeler, kasada ne kadar para var, Ahmet'in risk durumu ne, Halil'in kartı vb.) true, yoksa false.
+- chat_response: Eğer is_conversational true ise:
+  - Eğer kullanıcı bizden bir rapor, liste, dashboard, kasa özeti veya belirli bir komutun yapacağı işi istiyorsa, chat_response SADECE aşağıdaki formatlardan biri olmalıdır:
+    - "intent:bugun" (bugün ne hatırlatmalar var, bugünün özeti, bugünkü işler vb.)
+    - "intent:yarin" (yarın ne var, yarınki ödemeler, yarın kim ödeyecek vb.)
+    - "intent:liste" (tüm hatırlatmaları listele, açık taahhütler vb.)
+    - "intent:kasa" (kasada ne var, kasa özeti, ne kadar para bekliyor vb.)
+    - "intent:dashboard" (crm analizi, dashboardu göster, analiz raporu vb.)
+    - "intent:riskli" (en riskli müşteriler kimler, risk listesi vb.)
+    - "intent:musteriler" (kayıtlı müşteriler kimler, müşteri listesi vb.)
+    - "intent:kart:<Müşteri Adı>" (örn: "Ahmet Bey'in kartını göster" -> "intent:kart:Ahmet Bey", "Halil'in kartı" -> "intent:kart:Halil")
+    - "intent:risk:<Müşteri Adı>" (örn: "Ahmet Bey'in risk durumu nedir" -> "intent:risk:Ahmet Bey", "Halil'in risk oranı" -> "intent:risk:Halil")
+  - Eğer kullanıcı genel/günlük sohbet amaçlı konuşuyorsa (selam, nasılsın, bot ne işe yarar vb.), kullanıcıya günlük samimi ama son derece profesyonel, yardımsever ve "Gözde Plastik CRM Asistanı" kimliğiyle verilecek harika bir Türkçe cevap olmalıdır.
+  - is_conversational false ise null.
 - notes: Ek detay (ürün, durum). Yoksa boş string.
 
 SADECE JSON, başka hiçbir şey yazma.
@@ -257,8 +269,11 @@ SADECE JSON, başka hiçbir şey yazma.
 ÖRNEK 2: "sen ne işe yararsın"
 {{"customer_name": null, "title": null, "kind": null, "recurring": null, "has_date_clue": false, "date_phrase": null, "is_conversational": true, "chat_response": "Ben Gözde Plastik için özel olarak geliştirilmiş yapay zeka destekli hatırlatıcı asistanıyım. Ses kayıtlarınızı veya yazdığınız mesajları analiz ederek müşterilerinizin ödeme, kamyon yükleme, sipariş veya arama gibi taahhütlerini otomatik olarak kaydeder, veritabanına işler ve iPhone'unuzdaki Apple Reminders (Anımsatıcılar) uygulamasıyla çift yönlü senkronize ederim. Bana sesli veya yazılı olarak 'Ahmet Bey yarın ödeme yapacak' demeniz yeterlidir!", "notes": ""}}
 
-ÖRNEK 3: "selam nasılsın"
-{{"customer_name": null, "title": null, "kind": null, "recurring": null, "has_date_clue": false, "date_phrase": null, "is_conversational": true, "chat_response": "Harikayım, teşekkürler! Gözde Plastik CRM asistanınız olarak bugün size nasıl yardımcı olabilirim? Hatırlatma veya sipariş kaydetmek isterseniz doğrudan sesli veya yazılı olarak söyleyebilirsiniz.", "notes": ""}}
+ÖRNEK 3: "yarın kimlerin ödemesi var ne hatırlatmalarım var?"
+{{"customer_name": null, "title": null, "kind": null, "recurring": null, "has_date_clue": false, "date_phrase": null, "is_conversational": true, "chat_response": "intent:yarin", "notes": ""}}
+
+ÖRNEK 4: "Halil Bey'in kartını açıp risk durumuna bakar mısın?"
+{{"customer_name": null, "title": null, "kind": null, "recurring": null, "has_date_clue": false, "date_phrase": null, "is_conversational": true, "chat_response": "intent:kart:Halil Bey", "notes": ""}}
 """
 
 

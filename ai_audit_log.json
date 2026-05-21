@@ -1,0 +1,51 @@
+{
+  "system_name": "Gözde Plastik Müşteri Hatırlatma Botu & CRM",
+  "repository": "https://github.com/ekremtugay944-spec/ses-kaydedici.git",
+  "audit_version": "2.4.0",
+  "last_updated": "2026-05-21T14:30:00+03:00",
+  "changes": [
+    {
+      "version": "2.4.0",
+      "date": "2026-05-21",
+      "author": "Antigravity (AI Developer)",
+      "impact": "High",
+      "modified_files": [
+        "bot.py"
+      ],
+      "description": "Implemented dynamic routing of AI conversational intents, connecting natural-language queries directly to bot reporting and inquiry command handlers.",
+      "key_features": [
+        "Conversation-to-Intent translation",
+        "Mocking Context for Telegram compatibility",
+        "Seamless database-backed customer fuzzy lookup for card and risk details"
+      ]
+    },
+    {
+      "version": "2.3.0",
+      "date": "2026-05-21",
+      "author": "Antigravity (AI Developer)",
+      "impact": "Medium-High",
+      "modified_files": [
+        "parser.py"
+      ],
+      "description": "Refactored Gemini parsing schema to identify conversational queries, QA, greetings, and report requests, introducing 'is_conversational' and structured 'chat_response' intent formats.",
+      "key_features": [
+        "Added is_conversational and chat_response properties to Gemini output schema",
+        "Configured specific 'intent:<action>' outputs for report queries (bugun, yarin, kasa, risk, etc.)"
+      ]
+    },
+    {
+      "version": "2.2.1",
+      "date": "2026-05-21",
+      "author": "Antigravity (AI Developer)",
+      "impact": "Medium-High",
+      "modified_files": [
+        "parser.py"
+      ],
+      "description": "Implemented isolated date phrase extraction using hybrid AI parsing to handle complex natural language inputs like 'ali sürgülü yarın ödeme yapacak'.",
+      "key_features": [
+        "Added 'date_phrase' to Gemini extraction schema",
+        "Added fallback date parsing to ensure zero-clarification-needed reminder entry"
+      ]
+    }
+  ]
+}

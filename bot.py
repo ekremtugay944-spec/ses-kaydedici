@@ -1042,12 +1042,77 @@ async def process_text(update: Update, text: str, audio_archive_path: str = "",
 
     chat_id = update.effective_chat.id
 
-    # SOHBET / GENEL SORU?
+    # SOHBET / GENEL SORU / RAPOR YÖNLENDİRME?
     if parsed.get("is_conversational"):
-        await update.message.reply_text(
-            parsed.get("chat_response"),
-            parse_mode=ParseMode.MARKDOWN,
-        )
+        chat_resp = parsed.get("chat_response", "")
+        if chat_resp and chat_resp.startswith("intent:"):
+            # Mock context object for handlers that might check it (e.g. context.args)
+            class MockContext:
+                args = []
+            mock_context = MockContext()
+            
+            parts = chat_resp.split(":", 2)
+            action = parts[1] if len(parts) > 1 else ""
+            param = parts[2] if len(parts) > 2 else ""
+            
+            if action == "bugun":
+                await cmd_bugun(update, mock_context)
+            elif action == "yarin":
+                await cmd_yarin(update, mock_context)
+            elif action == "liste":
+                await cmd_liste(update, mock_context)
+            elif action == "kasa":
+                await cmd_kasa(update, mock_context)
+            elif action == "dashboard":
+                await cmd_dashboard(update, mock_context)
+            elif action == "riskli":
+                await cmd_riskli(update, mock_context)
+            elif action == "musteriler":
+                await cmd_musteriler(update, mock_context)
+            elif action == "kart":
+                if param:
+                    customer = db.find_customer_fuzzy(param)
+                    if customer:
+                        await _show_card(update, customer["name"])
+                    else:
+                        await update.message.reply_text(f"📭 *{param}* bulunamadı.", parse_mode=ParseMode.MARKDOWN)
+                else:
+                    await update.message.reply_text("❓ Hangi müşterinin kartını görmek istiyorsunuz?")
+            elif action == "risk":
+                if param:
+                    customer = db.find_customer_fuzzy(param)
+                    name_to_use = customer["name"] if customer else param
+                    stats = db.get_customer_risk(name_to_use)
+                    total = stats["created"]
+                    if total == 0:
+                        await update.message.reply_text(f"📭 *{name_to_use}* için kayıt yok.", parse_mode=ParseMode.MARKDOWN)
+                    else:
+                        rate = (stats["delayed"] / total * 100) if total else 0
+                        if rate < config.RISK_LOW_THRESHOLD:
+                            e, t = "🟢", "DÜŞÜK"
+                        elif rate < config.RISK_HIGH_THRESHOLD:
+                            e, t = "🟡", "ORTA"
+                        else:
+                            e, t = "🔴", "YÜKSEK"
+                        await update.message.reply_text(
+                            f"{e} *{name_to_use} — Risk: {t}*\n\n"
+                            f"Toplam: {total}, Tamam: {stats['completed']}, "
+                            f"Ertelenen: {stats['delayed']}, İptal: {stats['cancelled']}\n"
+                            f"Erteleme oranı: %{rate:.0f}",
+                            parse_mode=ParseMode.MARKDOWN,
+                        )
+                else:
+                    await update.message.reply_text("❓ Hangi müşterinin risk durumunu görmek istiyorsunuz?")
+            else:
+                await update.message.reply_text(
+                    f"Bilgi: Algılanan intent: *{chat_resp}* ancak yönlendirilemedi.",
+                    parse_mode=ParseMode.MARKDOWN,
+                )
+        else:
+            await update.message.reply_text(
+                parsed.get("chat_response"),
+                parse_mode=ParseMode.MARKDOWN,
+            )
         return
 
     # EKSİK BİLGİ?
