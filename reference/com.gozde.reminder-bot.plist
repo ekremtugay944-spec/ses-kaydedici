@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.gozde.reminder-bot</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <!-- "ekremtugay" yerine `whoami` çıktısını yaz -->
+        <string>/Users/ekremtugay/reminder-bot/venv/bin/python3</string>
+        <string>/Users/ekremtugay/reminder-bot/bot.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ekremtugay/reminder-bot</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ekremtugay/reminder-bot/bot-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/ekremtugay/reminder-bot/bot-stderr.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>

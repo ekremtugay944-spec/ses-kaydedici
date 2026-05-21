@@ -1,0 +1,66 @@
+# Ortam değişkenleri (token, secret)
+.env
+.env.local
+.env.*.local
+
+# Veritabanı (kişisel veri içerir)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Ses kayıtları (gizlilik)
+audio/
+voice_*.ogg
+voice_*.mp3
+voice_*.m4a
+voice_*.wav
+
+# Import/export geçici dosyaları
+import/upload_*.xlsx
+import/musteriler_export_*.xlsx
+import/musteri_sablon.xlsx
+
+# Yedekler
+backups/
+*.backup
+
+# Loglar
+*.log
+*.log.*
+bot.log*
+bot-stdout.log
+bot-stderr.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Whisper indirilen model önbelleği
+.cache/
+models/
+
+# launchd çalışma zamanı
+*.lock
