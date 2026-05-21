@@ -244,18 +244,19 @@ Verilen metinden ŞU ALANLARI çıkar (tarih çıkarma! O ayrı yapılacak):
 - has_date_clue: Metinde tarih ifadesi var mı? true/false
   - "yarın", "Cuma", "ay sonu", "25 Mayıs" vb. varsa true
   - "tekrar arayacağız" tek başına ise false (eksik bilgi)
+- date_phrase: Metindeki tarihle ilgili olan kısmın tam kelimeleri (örn: "yarın", "Cuma sabahı", "25 Mayıs", "haftaya Salı", "ay sonu"). Yoksa null.
 - notes: Ek detay (ürün, durum). Yoksa boş string.
 
 SADECE JSON, başka hiçbir şey yazma.
 
 ÖRNEK 1: "Ahmet Bey Bursa Spor 22 Kasım 15 bin lira ödeme"
-{{"customer_name": "Ahmet Bey - Bursa Spor", "title": "Ödeme", "kind": "odeme", "recurring": null, "has_date_clue": true, "notes": ""}}
+{{"customer_name": "Ahmet Bey - Bursa Spor", "title": "Ödeme", "kind": "odeme", "recurring": null, "has_date_clue": true, "date_phrase": "22 Kasım", "notes": ""}}
 
 ÖRNEK 2: "Mehmet'i aradık olumsuz döndü tekrar arayacağız"
-{{"customer_name": "Mehmet", "title": "Tekrar arama", "kind": "takip", "recurring": null, "has_date_clue": false, "notes": "İlk aramada olumsuz döndü"}}
+{{"customer_name": "Mehmet", "title": "Tekrar arama", "kind": "takip", "recurring": null, "has_date_clue": false, "date_phrase": null, "notes": "İlk aramada olumsuz döndü"}}
 
 ÖRNEK 3: "Her ayın 15'inde Halil'e bakiye sor"
-{{"customer_name": "Halil", "title": "Bakiye sorma", "kind": "arama", "recurring": {{"pattern": "monthly", "value": "15"}}, "has_date_clue": true, "notes": ""}}
+{{"customer_name": "Halil", "title": "Bakiye sorma", "kind": "arama", "recurring": {{"pattern": "monthly", "value": "15"}}, "has_date_clue": true, "date_phrase": "15'inde", "notes": ""}}
 """
 
 
@@ -341,6 +342,7 @@ def _fallback_structure(text: str) -> dict:
         "kind": kind,
         "recurring": None,
         "has_date_clue": has_date,
+        "date_phrase": None,
         "notes": "[Fallback parser - Ollama erisilemedi]",
     }
 
@@ -358,11 +360,20 @@ def parse_voice_text(text: str) -> dict:
     """
     logger.info(f"Parse: {text}")
 
-    parsed_date = parse_date_local(text)
-    logger.info(f"dateparser sonuc: {parsed_date}")
-
     structure = _extract_structure(text)
     logger.info(f"Yapi: {structure}")
+
+    # Önce Gemini'ın çıkardığı spesifik tarih ifadesini parse etmeyi dene
+    parsed_date = None
+    date_phrase = structure.get("date_phrase")
+    if date_phrase:
+        parsed_date = parse_date_local(date_phrase)
+        logger.info(f"date_phrase '{date_phrase}' parse sonuc: {parsed_date}")
+
+    # Bulamadıysa tüm metni dateparser ile dene
+    if not parsed_date:
+        parsed_date = parse_date_local(text)
+        logger.info(f"dateparser sonuc (tam metin): {parsed_date}")
 
     amount = parse_amount(text)
     logger.info(f"Tutar: {amount}")
