@@ -449,4 +449,7 @@ class ReminderScheduler:
             logger.error(f"Voice ledger temizliği hatası: {e}")
 
     def stop(self):
-        self.scheduler.shutdown()
+        try:
+            self.scheduler.shutdown()
+        except Exception:
+            pass

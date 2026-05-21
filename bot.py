@@ -222,7 +222,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "*MÜŞTERİ:* /kart `<isim>` /musteri /risk /musteriler /riskli\n"
         "*NOT:* `/not Ahmet eski model isteyince başı belaya girer`\n"
         "*TEKRAR:* /tekrarli /sil\\_tekrar\\_`<ID>`\n"
-        "*EXCEL:* /sablon /dısa\\_aktar (sonra Excel yolla)\n"
+        "*EXCEL:* /sablon /disa\\_aktar (sonra Excel yolla)\n"
         "*YEDEK:* /yedek  •  /istatistik  •  /version\n\n"
         "_Hatırlatma butonlarla yönetilir, ID yazmaya gerek yok._",
         parse_mode=ParseMode.MARKDOWN,
@@ -1205,7 +1205,7 @@ def main():
     app.add_handler(CommandHandler("not", cmd_not))
     app.add_handler(CommandHandler("tekrarli", cmd_tekrarli))
     app.add_handler(CommandHandler("sablon", cmd_sablon))
-    app.add_handler(CommandHandler(["dısa_aktar", "disa_aktar", "export"], cmd_dis_aktar))
+    app.add_handler(CommandHandler(["disa_aktar", "export"], cmd_dis_aktar))
     app.add_handler(CommandHandler("yedek", cmd_yedek))
 
     # Callback handler (inline keyboard tıklamaları)

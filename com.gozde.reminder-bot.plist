@@ -7,13 +7,12 @@
 
     <key>ProgramArguments</key>
     <array>
-        <!-- "ekremtugay" yerine `whoami` çıktısını yaz -->
-        <string>/Users/ekremtugay/reminder-bot/venv/bin/python3</string>
-        <string>/Users/ekremtugay/reminder-bot/bot.py</string>
+        <string>/Users/primesports/miniconda/bin/python3</string>
+        <string>/Users/primesports/Desktop/ses-kaydedici-crm/bot.py</string>
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/ekremtugay/reminder-bot</string>
+    <string>/Users/primesports/Desktop/ses-kaydedici-crm</string>
 
     <key>RunAtLoad</key>
     <true/>
@@ -22,15 +21,15 @@
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/Users/ekremtugay/reminder-bot/bot-stdout.log</string>
+    <string>/Users/primesports/Desktop/ses-kaydedici-crm/bot-stdout.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/ekremtugay/reminder-bot/bot-stderr.log</string>
+    <string>/Users/primesports/Desktop/ses-kaydedici-crm/bot-stderr.log</string>
 
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <string>/Users/primesports/miniconda/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
     </dict>
 </dict>
 </plist>
