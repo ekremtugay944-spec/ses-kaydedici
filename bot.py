@@ -753,6 +753,10 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_dynamic_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
+    if text.lower().strip() == "/iptal":
+        db.clear_conversation_state(update.effective_chat.id)
+        await update.message.reply_text("✅ İşlem iptal edildi.")
+        return
     m = re.match(r"^/sil_tekrar_(\d+)$", text)
     if m:
         rid = int(m.group(1))
