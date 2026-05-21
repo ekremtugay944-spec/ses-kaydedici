@@ -56,6 +56,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
 HAIKU_MODEL = os.getenv("HAIKU_MODEL", "claude-haiku-4-5")
 HAIKU_USE_FOR_RISK_ANALYSIS = _get_bool("HAIKU_USE_FOR_RISK_ANALYSIS", True)
 HAIKU_USE_FOR_AMBIGUITY = _get_bool("HAIKU_USE_FOR_AMBIGUITY", False)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 
 # ============================================================
 # DOSYA YOLLARI

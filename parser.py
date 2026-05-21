@@ -260,7 +260,28 @@ SADECE JSON, başka hiçbir şey yazma.
 
 
 def _extract_structure(text: str) -> dict:
-    """Ollama'dan yapı bilgisi al (tarih hariç). Timeout/hata olursa basit fallback."""
+    """Gemini veya Ollama'dan yapı bilgisi al (tarih hariç). Hata olursa basit fallback."""
+    from config import GEMINI_API_KEY
+    
+    if GEMINI_API_KEY:
+        try:
+            from google import genai
+            logger.info("Yapay zeka analizinde Google Gemini (gemini-2.5-flash) kullaniliyor...")
+            gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+            
+            prompt = f"{STRUCTURE_PROMPT}\n\nGirdi Metni:\n\"{text}\""
+            
+            response = gemini_client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config={"response_mime_type": "application/json"}
+            )
+            raw = response.text
+            raw = re.sub(r"```json\s*|\s*```", "", raw).strip()
+            return json.loads(raw)
+        except Exception as e:
+            logger.error(f"Gemini hatası, Ollama'ya geçiliyor: {e}")
+
     try:
         response = client.chat(
             model=OLLAMA_MODEL,
