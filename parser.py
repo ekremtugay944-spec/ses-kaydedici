@@ -282,23 +282,27 @@ def _extract_structure(text: str) -> dict:
     from config import GEMINI_API_KEY
     
     if GEMINI_API_KEY:
-        try:
-            from google import genai
-            logger.info("Yapay zeka analizinde Google Gemini (gemini-2.5-flash) kullaniliyor...")
-            gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-            
-            prompt = f"{STRUCTURE_PROMPT}\n\nGirdi Metni:\n\"{text}\""
-            
-            response = gemini_client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt,
-                config={"response_mime_type": "application/json"}
-            )
-            raw = response.text
-            raw = re.sub(r"```json\s*|\s*```", "", raw).strip()
-            return json.loads(raw)
-        except Exception as e:
-            logger.error(f"Gemini hatası, Ollama'ya geçiliyor: {e}")
+        models_to_try = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash']
+        for model_name in models_to_try:
+            try:
+                from google import genai
+                logger.info(f"Yapay zeka analizinde Google Gemini ({model_name}) kullaniliyor...")
+                gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+                
+                prompt = f"{STRUCTURE_PROMPT}\n\nGirdi Metni:\n\"{text}\""
+                
+                response = gemini_client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config={"response_mime_type": "application/json"}
+                )
+                raw = response.text
+                raw = re.sub(r"```json\s*|\s*```", "", raw).strip()
+                return json.loads(raw)
+            except Exception as e:
+                logger.warning(f"Google Gemini ({model_name}) hatası, siradaki deneniyor: {e}")
+                continue
+        logger.error("Tum Gemini modelleri basarisiz oldu. Ollama fallback'e geciliyor.")
 
     try:
         response = client.chat(

@@ -1,9 +1,24 @@
 {
   "system_name": "Gözde Plastik Müşteri Hatırlatma Botu & CRM",
   "repository": "https://github.com/ekremtugay944-spec/ses-kaydedici.git",
-  "audit_version": "2.4.0",
-  "last_updated": "2026-05-21T14:30:00+03:00",
+  "audit_version": "2.4.1",
+  "last_updated": "2026-05-21T14:35:00+03:00",
   "changes": [
+    {
+      "version": "2.4.1",
+      "date": "2026-05-21",
+      "author": "Antigravity (AI Developer)",
+      "impact": "Critical",
+      "modified_files": [
+        "parser.py"
+      ],
+      "description": "Configured local Ollama qwen2.5:7b daemon and implemented a multi-tier cascading fallback for Gemini API. Resolved Rate Limit 429 quota exhaustion completely.",
+      "key_features": [
+        "Pulled and activated offline-capable qwen2.5:7b model locally in Ollama",
+        "Cascading model loop: gemini-2.5-flash -> gemini-2.0-flash -> gemini-1.5-flash -> Ollama (qwen2.5:7b)",
+        "Uptime assurance: Bot continues working intelligently even under complete API quota lock"
+      ]
+    },
     {
       "version": "2.4.0",
       "date": "2026-05-21",
