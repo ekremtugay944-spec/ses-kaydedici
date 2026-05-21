@@ -1042,6 +1042,14 @@ async def process_text(update: Update, text: str, audio_archive_path: str = "",
 
     chat_id = update.effective_chat.id
 
+    # SOHBET / GENEL SORU?
+    if parsed.get("is_conversational"):
+        await update.message.reply_text(
+            parsed.get("chat_response"),
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
     # EKSİK BİLGİ?
     if parsed.get("needs_clarification"):
         question = parsed["needs_clarification"]["question"]

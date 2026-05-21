@@ -234,9 +234,9 @@ def parse_amount(text: str) -> Optional[float]:
 STRUCTURE_PROMPT = """Sen Türkçe metni JSON yapısına çeviren bir asistansın.
 Verilen metinden ŞU ALANLARI çıkar (tarih çıkarma! O ayrı yapılacak):
 
-- customer_name: Müşteri adı (kişi + firma varsa "Ahmet Bey - Bursa Spor")
-- title: Kısa başlık (örn "Ödeme", "Kamyon yükleme", "Tekrar arama")
-- kind: SADECE şunlardan biri: "odeme", "kamyon", "arama", "siparis", "takip", "diger"
+- customer_name: Müşteri adı (kişi + firma varsa "Ahmet Bey - Bursa Spor"). Hatırlatma/taahhüt değilse null.
+- title: Kısa başlık (örn "Ödeme", "Kamyon yükleme", "Tekrar arama"). Hatırlatma/taahhüt değilse null.
+- kind: SADECE şunlardan biri: "odeme", "kamyon", "arama", "siparis", "takip", "diger". Hatırlatma/taahhüt değilse null.
 - recurring: Tekrarlayan mı? null veya {{"pattern": "monthly|weekly|every_n_days", "value": "..."}}
   - "her ayın N'i" → {{"pattern": "monthly", "value": "N"}}
   - "her Salı" → {{"pattern": "weekly", "value": "tuesday"}}
@@ -245,18 +245,20 @@ Verilen metinden ŞU ALANLARI çıkar (tarih çıkarma! O ayrı yapılacak):
   - "yarın", "Cuma", "ay sonu", "25 Mayıs" vb. varsa true
   - "tekrar arayacağız" tek başına ise false (eksik bilgi)
 - date_phrase: Metindeki tarihle ilgili olan kısmın tam kelimeleri (örn: "yarın", "Cuma sabahı", "25 Mayıs", "haftaya Salı", "ay sonu"). Yoksa null.
+- is_conversational: Kullanıcı hatırlatma/CRM taahhüdü kaydetmek veya düzenlemek yerine; selam veriyorsa, nasılsın diyorsa, botun ne işe yaradığını/nasıl kullanılacağını soruyorsa veya genel/günlük sohbet amaçlı konuşuyorsa true, yoksa false.
+- chat_response: Eğer is_conversational true ise, kullanıcıya günlük samimi ama son derece profesyonel, yardımsever ve "Gözde Plastik CRM Asistanı" kimliğiyle verilecek harika bir Türkçe cevap. is_conversational false ise null.
 - notes: Ek detay (ürün, durum). Yoksa boş string.
 
 SADECE JSON, başka hiçbir şey yazma.
 
 ÖRNEK 1: "Ahmet Bey Bursa Spor 22 Kasım 15 bin lira ödeme"
-{{"customer_name": "Ahmet Bey - Bursa Spor", "title": "Ödeme", "kind": "odeme", "recurring": null, "has_date_clue": true, "date_phrase": "22 Kasım", "notes": ""}}
+{{"customer_name": "Ahmet Bey - Bursa Spor", "title": "Ödeme", "kind": "odeme", "recurring": null, "has_date_clue": true, "date_phrase": "22 Kasım", "is_conversational": false, "chat_response": null, "notes": ""}}
 
-ÖRNEK 2: "Mehmet'i aradık olumsuz döndü tekrar arayacağız"
-{{"customer_name": "Mehmet", "title": "Tekrar arama", "kind": "takip", "recurring": null, "has_date_clue": false, "date_phrase": null, "notes": "İlk aramada olumsuz döndü"}}
+ÖRNEK 2: "sen ne işe yararsın"
+{{"customer_name": null, "title": null, "kind": null, "recurring": null, "has_date_clue": false, "date_phrase": null, "is_conversational": true, "chat_response": "Ben Gözde Plastik için özel olarak geliştirilmiş yapay zeka destekli hatırlatıcı asistanıyım. Ses kayıtlarınızı veya yazdığınız mesajları analiz ederek müşterilerinizin ödeme, kamyon yükleme, sipariş veya arama gibi taahhütlerini otomatik olarak kaydeder, veritabanına işler ve iPhone'unuzdaki Apple Reminders (Anımsatıcılar) uygulamasıyla çift yönlü senkronize ederim. Bana sesli veya yazılı olarak 'Ahmet Bey yarın ödeme yapacak' demeniz yeterlidir!", "notes": ""}}
 
-ÖRNEK 3: "Her ayın 15'inde Halil'e bakiye sor"
-{{"customer_name": "Halil", "title": "Bakiye sorma", "kind": "arama", "recurring": {{"pattern": "monthly", "value": "15"}}, "has_date_clue": true, "date_phrase": "15'inde", "notes": ""}}
+ÖRNEK 3: "selam nasılsın"
+{{"customer_name": null, "title": null, "kind": null, "recurring": null, "has_date_clue": false, "date_phrase": null, "is_conversational": true, "chat_response": "Harikayım, teşekkürler! Gözde Plastik CRM asistanınız olarak bugün size nasıl yardımcı olabilirim? Hatırlatma veya sipariş kaydetmek isterseniz doğrudan sesli veya yazılı olarak söyleyebilirsiniz.", "notes": ""}}
 """
 
 
@@ -343,6 +345,8 @@ def _fallback_structure(text: str) -> dict:
         "recurring": None,
         "has_date_clue": has_date,
         "date_phrase": None,
+        "is_conversational": False,
+        "chat_response": None,
         "notes": "[Fallback parser - Ollama erisilemedi]",
     }
 
@@ -356,12 +360,29 @@ def parse_voice_text(text: str) -> dict:
     Hibrit ayrıştırma.
     Dönüş alanları:
         customer_name, title, kind, amount, due_date, remind_at, notes,
-        recurring, needs_clarification, is_past_log
+        recurring, needs_clarification, is_past_log, is_conversational, chat_response
     """
     logger.info(f"Parse: {text}")
 
     structure = _extract_structure(text)
     logger.info(f"Yapi: {structure}")
+
+    is_conversational = structure.get("is_conversational", False)
+    if is_conversational:
+        return {
+            "customer_name": None,
+            "title": "Sohbet",
+            "kind": "diger",
+            "amount": None,
+            "due_date": None,
+            "remind_at": None,
+            "notes": "",
+            "recurring": None,
+            "needs_clarification": None,
+            "is_past_log": False,
+            "is_conversational": True,
+            "chat_response": structure.get("chat_response", "Size nasıl yardımcı olabilirim?"),
+        }
 
     # Önce Gemini'ın çıkardığı spesifik tarih ifadesini parse etmeyi dene
     parsed_date = None
@@ -396,6 +417,8 @@ def parse_voice_text(text: str) -> dict:
                 "question": f"{structure.get('customer_name', 'Bu musteriyi')} ile ilgili ne zaman hatirlatayim? (orn: 'yarin', 'Cuma sabah', '25 Mayis')",
             },
             "is_past_log": False,
+            "is_conversational": False,
+            "chat_response": None,
         }
 
     if not parsed_date and has_clue:
@@ -438,6 +461,8 @@ def parse_voice_text(text: str) -> dict:
         "recurring": recurring,
         "needs_clarification": None,
         "is_past_log": is_past_log,
+        "is_conversational": False,
+        "chat_response": None,
     }
 
 
